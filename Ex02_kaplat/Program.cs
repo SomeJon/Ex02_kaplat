@@ -19,7 +19,7 @@ namespace Ex02_kaplat
             Question3Body que3Body
                 = new Question3Body(((que2Body.Id - 123503) % 92), ((que2Body.Year + 123) % 45));
             response3 = await updateDataInServer(baseUrl, new MessageObj(response2.Message), que3Body);
-            deleteDataInServer(baseUrl, response3);
+            await deleteDataInServer(baseUrl, response3);
         }
 
 
@@ -41,7 +41,7 @@ namespace Ex02_kaplat
             (string i_BaseUrl, Question2Body i_Body)
         {
             string url = i_BaseUrl + "test_post_method";
-            MessageObj returnMessage;
+            MessageObj? returnMessage;
 
             using (HttpClient client = new HttpClient())
             {
@@ -57,7 +57,7 @@ namespace Ex02_kaplat
             (string i_BaseUrl, MessageObj i_Message, Question3Body i_Body)
         {
             string url = i_BaseUrl + "test_put_method?id=" + i_Message.Message;
-            MessageObj returnMessage;
+            MessageObj? returnMessage;
 
             using (HttpClient client = new HttpClient())
             {
@@ -69,13 +69,15 @@ namespace Ex02_kaplat
         }
 
 
-        private static void deleteDataInServer(string i_BaseUrl, MessageObj i_Message)
+        private async static Task deleteDataInServer(string i_BaseUrl, MessageObj i_Message)
         {
             string url = i_BaseUrl + "test_delete_method?id=" + i_Message.Message;
+            MessageObj? returnMessage;
 
             using (HttpClient client = new HttpClient())
             {
-                client.DeleteAsync(url);
+                HttpResponseMessage response = await client.DeleteAsync(url);
+                returnMessage = await response.Content.ReadFromJsonAsync<MessageObj>();
             }
         }
     }
